@@ -70,8 +70,7 @@ export class TelegramProcessor {
       );
 
       this.logger.log(
-        `Message sent to ${chatId}: `,
-        response.data.ok ? 'OK' : response.data,
+        `Message with type ${contentType} sent to ${chatId}: Result ${response.data.ok ? 'OK' : response.data}`,
       );
     } catch (error) {
       this.logger.error(

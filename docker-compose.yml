@@ -1,9 +1,29 @@
-version: '3.9'
+version: '3.8'
 
 services:
   redis:
-    image: redis
-    container_name: redis
+    image: redis:latest
+    restart: always
     ports:
       - '6379:6379'
-    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+  rabbitmq:
+    build:
+      context: .
+      dockerfile: Dockerfile.rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbitmq_management load_definitions "/etc/rabbitmq/definitions.json"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./definitions.json:/etc/rabbitmq/definitions.json:ro
+
+volumes:
+  redis_data:
+  rabbitmq_data:

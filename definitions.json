@@ -1,0 +1,83 @@
+{
+  "users": [
+    {
+      "name": "admin",
+      "password": "admin",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "admin",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "dlx_exchange",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "delayed_exchange",
+      "vhost": "/",
+      "type": "x-delayed-message",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {
+        "x-delayed-type": "direct"
+      }
+    }
+  ],
+  "queues": [
+    {
+      "name": "tg_sender_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 60000,
+        "x-dead-letter-exchange": "dlx_exchange",
+        "x-dead-letter-routing-key": "dlx_routing_key"
+      }
+    },
+    {
+      "name": "dlq_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "delayed_exchange",
+      "vhost": "/",
+      "destination": "tg_sender_queue",
+      "destination_type": "queue",
+      "routing_key": "tg.send",
+      "arguments": {}
+    },
+    {
+      "source": "dlx_exchange",
+      "vhost": "/",
+      "destination": "dlq_queue",
+      "destination_type": "queue",
+      "routing_key": "dlx_routing_key",
+      "arguments": {}
+    }
+  ]
+}

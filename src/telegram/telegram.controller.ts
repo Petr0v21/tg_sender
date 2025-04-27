@@ -1,9 +1,8 @@
 import { Controller, Post, Body, Logger } from '@nestjs/common';
 import { TelegramService } from './telegram.service';
 import { SendMessageBulkDto, SendMessageDto } from './dto/SendMessage.dto';
-import { Payload, RpcException } from '@nestjs/microservices';
 import { HandledEventPattern } from 'src/common/decorators/handled-event.decorator';
-import { validateDto } from 'src/utils/validateDto';
+import { HandledPayload } from 'src/common/decorators/handle-payload.decorator';
 
 @Controller('telegram')
 export class TelegramController {
@@ -25,19 +24,8 @@ export class TelegramController {
     return { status: 'Messages added to queue' };
   }
 
-  @HandledEventPattern('tg.send')
-  async handleTgSend(@Payload() data: any) {
-    console.log('INSIDE!!!!!', data);
-    const { isValid, errors, dto } = await validateDto(
-      SendMessageDto,
-      data.payload,
-    );
-
-    if (!isValid) {
-      throw new RpcException({
-        message: 'Validation failed',
-        errors,
-      });
-    }
+  @HandledEventPattern('tg.send', SendMessageDto)
+  async handleTgSend(@HandledPayload() data: SendMessageDto) {
+    await this.telegramService.addToQueue(data);
   }
 }
