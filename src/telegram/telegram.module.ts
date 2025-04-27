@@ -10,6 +10,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
   imports: [
     BullModule.registerQueue({
       name: 'telegram-queue',
+      defaultJobOptions: {
+        removeOnComplete: true,
+        removeOnFail: 1000,
+      },
     }),
     ClientsModule.registerAsync([
       {
