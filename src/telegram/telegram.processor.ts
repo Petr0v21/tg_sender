@@ -9,7 +9,8 @@ export type MethodType =
   | 'sendPhoto'
   | 'sendVideo'
   | 'sendAudio'
-  | 'sendDocument';
+  | 'sendDocument'
+  | 'sendAnimation';
 
 export type RequestPayload = {
   chat_id: number | string;
@@ -21,6 +22,7 @@ export type RequestPayload = {
   audio?: string;
   photo?: string;
   video?: string;
+  animation?: string;
 };
 
 @Processor('telegram-queue')
@@ -44,7 +46,10 @@ export class TelegramProcessor {
         reply_markup: replyMarkup,
         parse_mode: 'HTML',
       };
-      payload[contentType ? 'caption' : 'text'] = text;
+
+      payload[
+        contentType && contentType !== ContentTypeEnum.TEXT ? 'caption' : 'text'
+      ] = text;
       let method: MethodType = 'sendMessage';
       switch (contentType) {
         case ContentTypeEnum.PHOTO:
@@ -63,7 +68,12 @@ export class TelegramProcessor {
           method = 'sendDocument';
           payload.document = fileUrl ?? fileId;
           break;
+        case ContentTypeEnum.ANIMATION:
+          method = 'sendAnimation';
+          payload.animation = fileUrl ?? fileId;
+          break;
       }
+
       const response = await axios.post(
         `https://api.telegram.org/bot${botToken}/${method}`,
         payload,

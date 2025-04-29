@@ -69,7 +69,9 @@ export class TelegramService {
     ...args
   }: SendMessageDto) {
     const rudeContentType =
-      !contentType && fileUrl ? await this.getTypeFromUrl(fileUrl) : null;
+      !contentType && fileUrl
+        ? await this.getTypeFromUrl(fileUrl)
+        : ContentTypeEnum.TEXT;
     const delay = await this.calculateDelay(
       type,
       this.getCacheKey(type, botToken, chatId),
@@ -125,7 +127,11 @@ export class TelegramService {
   }
 
   getContentTypeFromMimeType(mimeType: string): ContentTypeEnum {
+    if (!mimeType) return ContentTypeEnum.FILE;
+
     switch (true) {
+      case mimeType === 'image/gif':
+        return ContentTypeEnum.ANIMATION;
       case mimeType.startsWith('image/'):
         return ContentTypeEnum.PHOTO;
       case mimeType.startsWith('video/'):
