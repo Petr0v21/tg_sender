@@ -3,6 +3,7 @@ import { Job } from 'bull';
 import axios from 'axios';
 import { ContentTypeEnum, SendMessageDto } from './dto/SendMessage.dto';
 import { Logger } from '@nestjs/common';
+import { RedisService } from 'src/redis/redis.service';
 
 export type MethodType =
   | 'sendMessage'
@@ -28,6 +29,8 @@ export type RequestPayload = {
 @Processor('telegram-queue')
 export class TelegramProcessor {
   private logger: Logger = new Logger(TelegramProcessor.name);
+
+  constructor(private readonly redisService: RedisService) {}
 
   @Process('send-telegram-message')
   async handleSendMessage(job: Job<SendMessageDto>) {
@@ -87,6 +90,17 @@ export class TelegramProcessor {
         `Failed to send message to ${chatId}:`,
         error.response?.data || error.message,
       );
+
+      if (
+        error.response?.data?.error_code === 403 &&
+        error.response?.data?.description ===
+          'Forbidden: bot was blocked by the user'
+      ) {
+        await this.redisService
+          .getClient()
+          .setex(`${botToken}:${chatId}:block`, 300, 'blocked on 5 minutes');
+      }
+
       if (error.status === 429) {
         throw error;
       }

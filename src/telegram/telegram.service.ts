@@ -68,6 +68,14 @@ export class TelegramService {
     contentType,
     ...args
   }: SendMessageDto) {
+    const isBlocked = await this.redisService
+      .getClient()
+      .get(`${botToken}:${chatId}:block`);
+
+    if (isBlocked) {
+      return;
+    }
+
     const rudeContentType =
       !contentType && fileUrl
         ? await this.getTypeFromUrl(fileUrl)

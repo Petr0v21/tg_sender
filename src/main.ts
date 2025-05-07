@@ -3,6 +3,11 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
+//TODO LIST
+//1. Add compare limit broadcast and li it by chat (part of logic realized)
+//2. Add blacklist users chat
+//3. add isolated redis for this service
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
