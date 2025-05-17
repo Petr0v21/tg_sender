@@ -2,16 +2,18 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { json, urlencoded } from 'express';
 
 //TODO LIST
-//1. Add compare limit broadcast and li it by chat (part of logic realized)
-//2. Add blacklist users chat
-//3. add isolated redis for this service
+//1. add isolated redis for this service
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
+
+  app.use(json({ limit: '100mb' }));
+  app.use(urlencoded({ extended: true }));
 
   const rabbitUrl = process.env.RABBITMQ_URL;
   const rabbitQueue = process.env.RABBITMQ_QUEUE;

@@ -5,12 +5,15 @@ import { RedisModule } from './redis/redis.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TelegramModule } from './telegram/telegram.module';
 import { BullModule } from '@nestjs/bull';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -34,6 +37,7 @@ import { BullModule } from '@nestjs/bull';
       inject: [ConfigService],
     }),
     TelegramModule,
+    MediaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

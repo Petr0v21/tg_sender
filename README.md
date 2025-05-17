@@ -77,7 +77,7 @@ POST /send-message
   "fileId": "optional string",
   "replyMarkup": "optional object",
   "contentType": "optional enum (PHOTO | VIDEO | AUDIO | FILE)",
-  "type": "enum (SINGLE_CHAT | BROADCAST | GROUP)"
+  "type": "enum (SINGLE_CHAT | GROUP)"
 }
 ```
 
@@ -138,16 +138,16 @@ curl -X POST http://your-service/send-message/bulk \
 
 ### SendMessageDto
 
-| Field         | Type   | Required | Description                                  |
-| :------------ | :----- | :------- | :------------------------------------------- |
-| `botToken`    | string | ✅       | Bot token for authentication                 |
-| `chatId`      | string | ✅       | Target chat or user ID                       |
-| `text`        | string | ✅       | Text of the message                          |
-| `fileUrl`     | string | Optional | URL to attach a file                         |
-| `fileId`      | string | Optional | Telegram file ID to reuse                    |
-| `replyMarkup` | object | Optional | Telegram markup (inline keyboard)            |
-| `contentType` | enum   | Optional | Content type (PHOTO, VIDEO, AUDIO, FILE)     |
-| `type`        | enum   | ✅       | Message type (SINGLE_CHAT, BROADCAST, GROUP) |
+| Field         | Type   | Required | Description                              |
+| :------------ | :----- | :------- | :--------------------------------------- |
+| `botToken`    | string | ✅       | Bot token for authentication             |
+| `chatId`      | string | ✅       | Target chat or user ID                   |
+| `text`        | string | ✅       | Text of the message                      |
+| `fileUrl`     | string | Optional | URL to attach a file                     |
+| `fileId`      | string | Optional | Telegram file ID to reuse                |
+| `replyMarkup` | object | Optional | Telegram markup (inline keyboard)        |
+| `contentType` | enum   | Optional | Content type (PHOTO, VIDEO, AUDIO, FILE) |
+| `type`        | enum   | ✅       | Message type (SINGLE_CHAT, GROUP)        |
 
 ### SendMessageBulkDto
 

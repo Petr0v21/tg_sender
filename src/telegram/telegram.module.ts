@@ -5,6 +5,7 @@ import { TelegramProcessor } from './telegram.processor';
 import { TelegramController } from './telegram.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { TelegramRateLimitService } from './telegram-rate-limit.service';
 
 @Module({
   imports: [
@@ -40,6 +41,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ]),
   ],
   controllers: [TelegramController],
-  providers: [TelegramService, TelegramProcessor],
+  providers: [TelegramService, TelegramRateLimitService, TelegramProcessor],
 })
 export class TelegramModule {}

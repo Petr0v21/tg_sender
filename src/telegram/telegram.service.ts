@@ -2,63 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { RedisService } from 'src/redis/redis.service';
-import {
-  ContentTypeEnum,
-  SendMessageDto,
-  TypeTelegramMessage,
-} from './dto/SendMessage.dto';
+import { ContentTypeEnum, SendMessageDto } from './dto/SendMessage.dto';
 import * as https from 'https';
 import * as http from 'http';
 import { URL } from 'url';
+import { TelegramRateLimitService } from './telegram-rate-limit.service';
 
 @Injectable()
 export class TelegramService {
   constructor(
     @InjectQueue('telegram-queue') private mailingQueue: Queue,
     private readonly redisService: RedisService,
+    private readonly telegramRateLimitService: TelegramRateLimitService,
   ) {}
-
-  private getCacheKey(
-    type: TypeTelegramMessage,
-    botToken: string,
-    chatId: string,
-  ) {
-    let lastPart = '';
-    switch (type) {
-      case TypeTelegramMessage.BROADCAST:
-        lastPart = `lastBroadcastMessageTime`;
-        break;
-      case TypeTelegramMessage.GROUP:
-        lastPart = `lastGroupMessageTime:${chatId}`;
-        break;
-      default:
-        lastPart = `lastChatMessageTime:${chatId}`;
-    }
-    return `${botToken}:${lastPart}`;
-  }
-
-  private async calculateDelay(
-    type: TypeTelegramMessage,
-    cacheKey: string,
-  ): Promise<number> {
-    const now = Date.now();
-    const lastMessageTime = await this.redisService.getClient().get(cacheKey);
-
-    const diff = now - (lastMessageTime ? parseInt(lastMessageTime) : 0);
-    let delay = 0;
-    switch (type) {
-      case TypeTelegramMessage.BROADCAST:
-        delay = Math.max(0, 1000 / 30 - diff);
-        break;
-      case TypeTelegramMessage.GROUP:
-        delay = Math.max(0, 1000 / 20 - diff);
-        break;
-      default:
-        delay = Math.max(0, 1000 - diff);
-    }
-    await this.redisService.getClient().set(cacheKey, now + delay);
-    return delay;
-  }
 
   async addToQueue({
     chatId,
@@ -66,6 +22,7 @@ export class TelegramService {
     fileUrl,
     type,
     contentType,
+    fileId,
     ...args
   }: SendMessageDto) {
     const isBlocked = await this.redisService
@@ -80,9 +37,12 @@ export class TelegramService {
       !contentType && fileUrl
         ? await this.getTypeFromUrl(fileUrl)
         : ContentTypeEnum.TEXT;
-    const delay = await this.calculateDelay(
+
+    const delay = await this.telegramRateLimitService.calculateDelay(
       type,
-      this.getCacheKey(type, botToken, chatId),
+      botToken,
+      chatId,
+      !!(fileUrl ?? fileId),
     );
 
     await this.mailingQueue.add(

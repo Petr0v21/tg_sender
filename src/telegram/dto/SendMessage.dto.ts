@@ -16,14 +16,16 @@ export enum ContentTypeEnum {
   TEXT = 'TEXT',
   PHOTO = 'PHOTO',
   VIDEO = 'VIDEO',
+  VIDEO_NOTE = 'VIDEO_NOTE',
   AUDIO = 'AUDIO',
+  VOICE = 'VOICE',
   FILE = 'FILE',
   ANIMATION = 'ANIMATION',
+  STICKER = 'STICKER',
 }
 
 export enum TypeTelegramMessage {
   SINGLE_CHAT = 'SINGLE_CHAT',
-  BROADCAST = 'BROADCAST',
   GROUP = 'GROUP',
 }
 
