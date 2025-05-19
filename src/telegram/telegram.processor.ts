@@ -118,9 +118,6 @@ export class TelegramProcessor {
           payload.sticker = fileUrl ?? fileId;
           break;
       }
-
-      console.log(`https://api.telegram.org/bot${botToken}/${method}`, payload);
-
       const response = await axios.post(
         `https://api.telegram.org/bot${botToken}/${method}`,
         payload,
@@ -158,8 +155,6 @@ export class TelegramProcessor {
         }
       }
     } catch (error) {
-      console.error(error);
-
       this.logger.error(
         `Failed to send message to ${chatId}:`,
         error.response?.data || error.message,

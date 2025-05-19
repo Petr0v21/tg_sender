@@ -12,9 +12,7 @@ export class MediaService implements OnModuleInit {
   constructor(
     private readonly redisService: RedisService,
     private readonly configService: ConfigService,
-  ) {
-    console.log(resolve(__dirname, this.configService.get('MEDIA_FOLDER')));
-  }
+  ) {}
 
   async onModuleInit() {
     const mediaDir = resolve(__dirname, this.configService.get('MEDIA_FOLDER'));
