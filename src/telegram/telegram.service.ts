@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { RedisService } from 'src/redis/redis.service';
@@ -10,6 +10,8 @@ import { TelegramRateLimitService } from './telegram-rate-limit.service';
 
 @Injectable()
 export class TelegramService {
+  private logger: Logger = new Logger(TelegramService.name);
+
   constructor(
     @InjectQueue('telegram-queue') private mailingQueue: Queue,
     private readonly redisService: RedisService,
@@ -43,6 +45,10 @@ export class TelegramService {
       botToken,
       chatId,
       !!(fileUrl ?? fileId),
+    );
+
+    this.logger.log(
+      `Delay ${delay} for ${chatId} with data ${JSON.stringify({ type, botToken, chatId })}`,
     );
 
     await this.mailingQueue.add(

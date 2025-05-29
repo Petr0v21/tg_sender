@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Logger } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { TelegramService } from './telegram.service';
 import { SendMessageBulkDto, SendMessageDto } from './dto/SendMessage.dto';
 import { HandledEventPattern } from 'src/common/decorators/handled-event.decorator';
@@ -6,8 +6,6 @@ import { HandledPayload } from 'src/common/decorators/handle-payload.decorator';
 
 @Controller('telegram')
 export class TelegramController {
-  private logger: Logger = new Logger(TelegramController.name);
-
   constructor(private readonly telegramService: TelegramService) {}
 
   @Post('/send-message')

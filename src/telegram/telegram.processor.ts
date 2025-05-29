@@ -60,9 +60,11 @@ export class TelegramProcessor {
       const isBlockedBy429 = await this.redisService.getClient().get(blockKey);
 
       if (isBlockedBy429) {
+        this.logger.warn(`Sleep ${isBlockedBy429}ms for ${job.data}`);
         await new Promise((resolve) =>
           setTimeout(resolve, Number(isBlockedBy429)),
         );
+        this.logger.log(`Unsleep ${isBlockedBy429}ms for ${job.data}`);
       }
 
       const payload: RequestPayload = {
@@ -119,8 +121,6 @@ export class TelegramProcessor {
           break;
       }
 
-      console.log(`https://api.telegram.org/bot${botToken}/${method}`, payload);
-
       const response = await axios.post(
         `https://api.telegram.org/bot${botToken}/${method}`,
         payload,
@@ -163,6 +163,7 @@ export class TelegramProcessor {
       this.logger.error(
         `Failed to send message to ${chatId}:`,
         error.response?.data || error.message,
+        job.data,
       );
 
       if (
