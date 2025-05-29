@@ -56,6 +56,7 @@ export class TelegramService {
       {
         chatId,
         fileUrl,
+        fileId,
         botToken,
         ...args,
         contentType: contentType ?? rudeContentType,

@@ -158,8 +158,6 @@ export class TelegramProcessor {
         }
       }
     } catch (error) {
-      console.error(error);
-
       this.logger.error(
         `Failed to send message to ${chatId}:`,
         error.response?.data || error.message,
